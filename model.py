@@ -30,6 +30,8 @@ class Model:
             exit(1)
         #读取图片
         self.data_images = [utils.imread(path) for path in data_images_path]
+        #转换图片
+        self.data_images = [utils.transform(image) for image in self.data_images]
         #图片的宽度
         self.image_width = len(self.data_images[0])
         self.image_height = len(self.data_images[0][0])

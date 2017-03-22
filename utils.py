@@ -85,10 +85,14 @@ def save_images(images, i, folder):
     for idx, image in enumerate(inverse_transform(images)):
         scipy.misc.imsave(os.path.join(folder, '%s.png' % (i * idx)), image)
 
+#保存图片的时候需要处理
 def inverse_transform(images):
     return (images + 1.) / 2.
-      
 
+#将图片每一像素的值转为-1到1之间
+def transform(images):
+      return np.array(images) / 127.5 - 1.0
+      
 
 
 
