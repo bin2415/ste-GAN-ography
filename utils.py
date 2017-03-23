@@ -62,11 +62,11 @@ def convertImg2Arr(image):
       return result
 
 #将一维数组转化为图片
-def convertArr2Img(list, width, height):
-      image = np.ones((width, height, 3), dtype = int16)
+def convertArr2Img(list, width, height, rgb):
+      image = np.ones((width, height, rgb), dtype = int16)
       for i in range(width):
             for j in range(height):
-                  for k in range(3):
+                  for k in range(rgb):
                         image[i][j][k] = list[i*j*k]
       return image
 

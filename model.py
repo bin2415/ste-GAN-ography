@@ -84,7 +84,7 @@ class Model:
         weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc6')
 
         #转化Bob输入为图片矩阵
-        self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height) for arr in alice_fc6.eval()]
+        self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height, self.rgb) for arr in alice_fc6.eval()]
         
         bob_input = tf.convert_to_tensor(Bob_input.eval())
         #将batch_norm与激活函数添加其中
