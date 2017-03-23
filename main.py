@@ -33,6 +33,11 @@ for i in range(FLAGS.training):
       model = Model(FLAGS, FLAGS.plain_nums, FLAGS.batch_size, FLAGS.learning_rate)
       print("training {0} begining".format(i))
       bob_results = model.train(FLAGS.training_epochs)
+      alice_processed_results = model.Bob_input  #Alice最终加工生成的图片
+      #alice_processed_results = utils.inverse_transform(alice_processed_results)
+      utils.save_images(alice_processed_results, i, FLAGS.save_pic_dict)  #存放图片
+      
+
 
 
 

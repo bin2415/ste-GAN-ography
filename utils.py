@@ -10,6 +10,7 @@
 import tensorflow as tf
 import scipy.misc
 import numpy as np
+import os
 
 def generate_data(batch_size, length):
       P = 2 * tf.random_uniform([batch_size, length], minval = 0, maxval = 2, dtype = tf.int32) -1
@@ -63,9 +64,9 @@ def convertImg2Arr(image):
 #将一维数组转化为图片
 def convertArr2Img(list, width, height):
       image = np.ones((width, height, 3), dtype = int16)
-      for i in width:
-            for j in height:
-                  for k in 3:
+      for i in range(width):
+            for j in range(height):
+                  for k in range(3):
                         image[i][j][k] = list[i*j*k]
       return image
 
@@ -78,7 +79,7 @@ def Distance(P1, P2, weidu):
 
 def calculate_bit_error(P1, P2):
       boolean_error = tf.cast(tf.not_equal(tf.sign(P1), tf.sign(P2)), tf.float32)
-      return tr.reduce_mean(tf.reduce_sum(boolean_error, [1]))
+      return tf.reduce_mean(tf.reduce_sum(boolean_error, [1]))
 
 
 def save_images(images, i, folder):
