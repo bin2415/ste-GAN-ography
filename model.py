@@ -12,6 +12,7 @@ import tensorflow as tf
 import os
 from helper import *
 from glob import glob
+import numpy as np
 from tensorflow.contrib.layers import convolution2d
 from tensorflow.contrib.layers import fully_connected
 from tensorflow.python.ops.nn import sigmoid_cross_entropy_with_logits as cross_entropy
@@ -44,14 +45,17 @@ class Model:
 
         
         self.data_images = self.data_images[0 : batch_size]
-        self.image_width = self.data_images[0]
+        #self.image_width = self.data_images[0]
 
 
         ##################################
         ####   Alice网络的结构   ##########
         ##################################
         #Alice的图片输入，将其转为一维数组
-        Alice_image = [utils.convertImg2Arr(sample) for sample in self.data_images]
+        #Alice_image = [utils.convertImg2Arr(sample) for sample in self.data_images]
+        Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
+        print("转换一维数组成功")
+        #Alice_image = tf.reshape(self.data_images, [batch_size, self.image_width * self.image_height * self.rgb])
         Alice_input = tf.concat(1, [Alice_image, self.P])
         image_length = len(Alice_image[0])
         '''alice_fc1 = fc_layer(Alice_input, shape = (len(Alice_input[0]), 2 * image_length), name = "alice_bob/alice_fc1", lasted = False)
@@ -84,7 +88,9 @@ class Model:
         weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc6')
 
         #转化Bob输入为图片矩阵
-        self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height, self.rgb) for arr in alice_fc6.eval()]
+        #self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height, self.rgb) for arr in alice_fc6.eval()]
+        self.Bob_input = np.array(alice_fc6).reshape([batch_size, self.image_width, self.image_height, self.rgb])
+        #bob_input = tf.reshape(alice_fc6, [batch_size, self.image_width, self.image_height, self.rgb])
         
         bob_input = tf.convert_to_tensor(Bob_input.eval())
         #将batch_norm与激活函数添加其中
