@@ -53,6 +53,7 @@ class Model:
         ##################################
         #Alice的图片输入，将其转为一维数组
         #Alice_image = [utils.convertImg2Arr(sample) for sample in self.data_images]
+        print('hello')
         Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
         print("转换一维数组成功")
         #Alice_image = tf.reshape(self.data_images, [batch_size, self.image_width * self.image_height * self.rgb])
