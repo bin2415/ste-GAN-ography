@@ -14,7 +14,7 @@ import os
 
 def generate_data(batch_size, length):
       P = 2 * tf.random_uniform([batch_size, length], minval = 0, maxval = 2, dtype = tf.int32) -1
-      return P
+      return tf.to_float(P)
 
 def bias_variable(shape, value, name):
       initial = tf.constant(value, shape = shape)

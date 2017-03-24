@@ -54,10 +54,11 @@ class Model:
         #Alice的图片输入，将其转为一维数组
         #Alice_image = [utils.convertImg2Arr(sample) for sample in self.data_images]
         print('hello')
-        Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
+        #Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
+        Alice_image = [np.array(imageTemp).ravel() for imageTemp in self.data_images]
         print("转换一维数组成功")
         #Alice_image = tf.reshape(self.data_images, [batch_size, self.image_width * self.image_height * self.rgb])
-        Alice_input = tf.concat(1, [Alice_image, self.P])
+        Alice_input = tf.concat([tf.to_float(tf.stack(Alice_image)), self.P], 1)
         image_length = len(Alice_image[0])
         '''alice_fc1 = fc_layer(Alice_input, shape = (len(Alice_input[0]), 2 * image_length), name = "alice_bob/alice_fc1", lasted = False)
         alice_fc1 = self.batch_norm(alice_fc1, scope = 'aclie_bob/alice_fc1')
@@ -90,32 +91,34 @@ class Model:
 
         #转化Bob输入为图片矩阵
         #self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height, self.rgb) for arr in alice_fc6.eval()]
-        self.Bob_input = np.array(alice_fc6).reshape([batch_size, self.image_width, self.image_height, self.rgb])
-        #bob_input = tf.reshape(alice_fc6, [batch_size, self.image_width, self.image_height, self.rgb])
+        #self.Bob_input = np.array(alice_fc6).reshape([batch_size, self.image_width, self.image_height, self.rgb])
+        #temp_results = alice_fc6.eval()
+        #self.Bob_input = [np.array(temp).reshape([self.image_width, self.image_height, self.rgb]) for temp in temp_results]
+        self.bob_input = tf.reshape(alice_fc6, [batch_size, self.image_width, self.image_height, self.rgb])
         
-        bob_input = tf.convert_to_tensor(Bob_input.eval())
+        #bob_input = tf.stack(self.Bob_input)
         #将batch_norm与激活函数添加其中
 
         #Eve网络
-        eve_real = self.discriminator_stego_nn(self.data_images)
-        eve_fake = self.discriminator_stego_nn(self.bob_input)
+        eve_real = self.discriminator_stego_nn(tf.to_float(tf.stack(self.data_images)), batch_size)
+        eve_fake = self.discriminator_stego_nn(self.bob_input, batch_size)
 
         ########################################
         ########### Bob的网络结构 ###############
         ########################################
-        bob_conv1 = convolution2d(bob_input, kernel_size = [5, 5], stride = [2,2],
+        bob_conv1 = convolution2d(self.bob_input, 64, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv1')
 
-        bob_conv2 = convolution2d(bob_conv1, kernel_size = [5, 5], stride = [2,2],
+        bob_conv2 = convolution2d(bob_conv1, 64 * 2, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv2')
 
-        bob_conv3 = convolution2d(bob_conv2, kernel_size = [5, 5], stride = [2,2],
+        bob_conv3 = convolution2d(bob_conv2, 64 * 4, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv3')
 
-        bob_conv4 = convolution2d(bob_conv2, kernel_size = [5, 5], stride = [2,2],
+        bob_conv4 = convolution2d(bob_conv2, 64 * 8,kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv4')
-       
 
+        bob_conv4 = tf.reshape(bob_conv4, [batch_size, -1])
         bob_fc = fully_connected(bob_conv4, N, activation_fn = tf.nn.tanh, normalizer_fn = BatchNorm,
         weights_initializer=tf.random_normal_initializer(stddev=1.0))
         #Bob_loss = tf.reduce_mean(utils.Distance(bob_fc, self.P, [1]))
@@ -124,12 +127,12 @@ class Model:
 
 
         #Eve的损失函数
-        Eve_fake_loss = tf.reduce_mean(cross_entropy(eve_fake, tf.zeros(eve_fake)))
-        Eve_real_loss = tf.reduce_mean(cross_entropy(eve_real, tf.ones(eve_real)))
+        Eve_fake_loss = tf.reduce_mean(cross_entropy(logits = eve_fake, labels = tf.zeros_like(eve_fake)))
+        Eve_real_loss = tf.reduce_mean(cross_entropy(logits = eve_real, labels = tf.ones_like(eve_real)))
         Eve_loss = Eve_fake_loss + Eve_real_loss
 
         #Alice的损失函数
-        Alice_C_loss = tf.reduce_mean(utils.Distance(bob_input, self.data_images, [1, 2]))
+        Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, tf.to_float(tf.stack(self.data_images)), [1, 2]))
         Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * Eve_loss
  
         #定义优化器
@@ -157,18 +160,20 @@ class Model:
 
     
     ### Eve的网络结构
-    def discriminator_stego_nn(self, img):
-        eve_conv1 = convolution2d(img, kernel_size = [5, 5], stride = [2,2],
+    def discriminator_stego_nn(self, img, batch_size):
+        eve_conv1 = convolution2d(img, 64, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'eve/conv1')
 
-        eve_conv2 = convolution2d(eve_conv1, kernel_size = [5, 5], stride = [2,2],
+        eve_conv2 = convolution2d(eve_conv1, 64 * 2, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'eve/conv2')
 
-        eve_conv3 = convolution2d(eve_conv2, kernel_size = [5, 5], stride = [2,2],
+        eve_conv3 = convolution2d(eve_conv2, 64 * 4,kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'eve/conv3')
 
-        eve_conv4 = convolution2d(eve_conv2, kernel_size = [5, 5], stride = [2,2],
+        eve_conv4 = convolution2d(eve_conv2, 64* 8, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'eve/conv4')
+
+        eve_conv4 = tf.reshape(eve_conv4, [batch_size, -1])
 
         eve_fc = fully_connected(eve_conv4, 1, activation_fn = tf.nn.sigmoid, normalizer_fn = BatchNorm,
         weights_initializer=tf.random_normal_initializer(stddev=1.0))
