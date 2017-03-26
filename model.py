@@ -55,11 +55,14 @@ class Model:
         #Alice_image = [utils.convertImg2Arr(sample) for sample in self.data_images]
         print('hello')
         #Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
-        Alice_image = [np.array(imageTemp).ravel() for imageTemp in self.data_images]
+        #Alice_image = [np.array(imageTemp).ravel() for imageTemp in self.data_images]
+        self.data_images = tf.stack(self.data_images)
+        Alice_image = tf.to_float(tf.reshape(self.data_images, [batch_size, -1]))
         print("转换一维数组成功")
         #Alice_image = tf.reshape(self.data_images, [batch_size, self.image_width * self.image_height * self.rgb])
-        Alice_input = tf.concat([tf.to_float(tf.stack(Alice_image)), self.P], 1)
-        image_length = len(Alice_image[0])
+        #Alice_input = tf.concat([tf.to_float(tf.stack(Alice_image)), self.P], 1)
+        Alice_input = tf.concat([Alice_image, self.P], 1)
+        image_length = self.image_height * self.image_width * self.rgb + N
         '''alice_fc1 = fc_layer(Alice_input, shape = (len(Alice_input[0]), 2 * image_length), name = "alice_bob/alice_fc1", lasted = False)
         alice_fc1 = self.batch_norm(alice_fc1, scope = 'aclie_bob/alice_fc1')
         alice_fc2 = fc_layer(alice_fc1, shape = (2 * image_length, 4 * image_length), name = 'Alice_bob/alice_fc2', lasted = False)
@@ -74,7 +77,7 @@ class Model:
         alice_fc6 = fc_layer(alice_fc5, shape = (2 * image_length, image_length), name = 'alice_bob/alice_fc6', lasted = True)
         alice_fc6 = self.batch_norm(alice_fc6, scope = 'alice_bob/alice_fc6')'''
         #使用fully_connected函数代替
-        alice_fc1 = fully_connected(Alice_input, 2 * image_length, activation_fn = tf.nn.relu, normalizer_fn = BatchNorm,
+        '''alice_fc1 = fully_connected(Alice_input, 2 * image_length, activation_fn = tf.nn.relu, normalizer_fn = BatchNorm,
         weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc1')
 
         alice_fc2 = fully_connected(alice_fc1, 4 * image_length, activation_fn = tf.nn.relu, normalizer_fn = BatchNorm,
@@ -87,20 +90,27 @@ class Model:
         alice_fc5 = fully_connected(alice_fc4, 2 * image_length, activation_fn = tf.nn.relu, normalizer_fn = BatchNorm,
         weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc5')
         alice_fc6 = fully_connected(alice_fc5, image_length, activation_fn = tf.nn.tanh, normalizer_fn = BatchNorm,
-        weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc6')
+        weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc6')'''
+        alice_fc = fc_layer(Alice_input, shape = (image_length, image_length - N), name = 'alice/alice_fc')
+        alice_fc = tf.reshape(alice_fc, [batch_size, image_length-N, 1])
+        alice_conv1 = conv_layer(alice_fc, filter_shape = [4,1,2], stride = 1, sigmoid = True, name = 'alice/alice_conv1')
+        alice_conv2 = conv_layer(alice_conv1, filter_shape = [2,2,4], stride = 1, sigmoid = True, name = 'alice/alice_conv2')
+        alice_conv3 = conv_layer(alice_conv2, filter_shape = [1,4,4], stride = 1, sigmoid = True, name = 'alice/alice_conv3')
+        alice_conv4 = conv_layer(alice_conv3, filter_shape = [1,4,1], stride = 1, sigmoid = False, name = 'alice/alice_conv4')
+
 
         #转化Bob输入为图片矩阵
         #self.Bob_input = [utils.convertArr2Img(arr, self.width, self.height, self.rgb) for arr in alice_fc6.eval()]
         #self.Bob_input = np.array(alice_fc6).reshape([batch_size, self.image_width, self.image_height, self.rgb])
         #temp_results = alice_fc6.eval()
         #self.Bob_input = [np.array(temp).reshape([self.image_width, self.image_height, self.rgb]) for temp in temp_results]
-        self.bob_input = tf.reshape(alice_fc6, [batch_size, self.image_width, self.image_height, self.rgb])
+        self.bob_input = tf.reshape(alice_conv4, [batch_size, self.image_width, self.image_height, self.rgb])
         
         #bob_input = tf.stack(self.Bob_input)
         #将batch_norm与激活函数添加其中
 
         #Eve网络
-        eve_real = self.discriminator_stego_nn(tf.to_float(tf.stack(self.data_images)), batch_size)
+        eve_real = self.discriminator_stego_nn(tf.to_float(self.data_images), batch_size)
         eve_fake = self.discriminator_stego_nn(self.bob_input, batch_size)
 
         ########################################
@@ -156,7 +166,7 @@ class Model:
         self.Bob_bit_error = utils.calculate_bit_error(self.P, bob_fc)
 
         #初始化所有变量
-        self.sess.run(tf.initialize_all_variables())
+        self.sess.run(tf.global_variables_initializer())
 
     
     ### Eve的网络结构
@@ -183,7 +193,7 @@ class Model:
     def train(self, epochs):
         bob_results = []
         for i in range(epochs):
-            if x % 100 == 0:
+            if i % 100 == 0:
                 bit_error = self.Bob_bit_error.eval()
                 print("step {}, bit error {}".format(i, bit_error))
                 bob_results.append(bit_error)

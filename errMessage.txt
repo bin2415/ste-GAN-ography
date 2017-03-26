@@ -1,0 +1,155 @@
+W c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\framework\op_kernel.cc:983] Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 98304
+  }
+  dim {
+    size: 49152
+  }
+}
+float_val: 0
+
+E c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\common_runtime\executor.cc:594] Executor failed to create kernel. Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 98304
+  }
+  dim {
+    size: 49152
+  }
+}
+float_val: 0
+
+         [[Node: zeros_13 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 98304 } dim { size: 49152 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+W c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\framework\op_kernel.cc:983] Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 98304
+  }
+  dim {
+    size: 49152
+  }
+}
+float_val: 0
+
+E c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\common_runtime\executor.cc:594] Executor failed to create kernel. Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 98304
+  }
+  dim {
+    size: 49152
+  }
+}
+float_val: 0
+
+         [[Node: zeros_12 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 98304 } dim { size: 49152 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+W c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\framework\op_kernel.cc:983] Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 49152
+  }
+  dim {
+    size: 98304
+  }
+}
+float_val: 0
+
+E c:\tf_jenkins\home\workspace\release-win\device\cpu\os\windows\tensorflow\core\common_runtime\executor.cc:594] Executor failed to create kernel. Invalid argument: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 49152
+  }
+  dim {
+    size: 98304
+  }
+}
+float_val: 0
+
+         [[Node: zeros_8 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 49152 } dim { size: 98304 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+Traceback (most recent call last):
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 1022, in _do_call
+    return fn(*args)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 1004, in _run_fn
+    status, run_metadata)
+  File "D:\anaconda3\envs\tensorflow\lib\contextlib.py", line 66, in __exit__
+    next(self.gen)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\errors_impl.py", line 466, in raise_exception_on_not_ok_status
+    pywrap_tensorflow.TF_GetCode(status))
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 49152
+  }
+  dim {
+    size: 98304
+  }
+}
+float_val: 0
+
+         [[Node: zeros_8 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 49152 } dim { size: 98304 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "main.py", line 37, in <module>
+    model = Model(FLAGS, FLAGS.plain_nums, FLAGS.batch_size, FLAGS.learning_rate)
+  File "C:\Users\binpang\Desktop\bishe\ste_GAN_ography\model.py", line 159, in __init__
+    self.sess.run(tf.initialize_all_variables())
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 767, in run
+    run_metadata_ptr)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 965, in _run
+    feed_dict_string, options, run_metadata)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 1015, in _do_run
+    target_list, options, run_metadata)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\client\session.py", line 1035, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 49152
+  }
+  dim {
+    size: 98304
+  }
+}
+float_val: 0
+
+         [[Node: zeros_8 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 49152 } dim { size: 98304 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+
+Caused by op 'zeros_8', defined at:
+  File "main.py", line 37, in <module>
+    model = Model(FLAGS, FLAGS.plain_nums, FLAGS.batch_size, FLAGS.learning_rate)
+  File "C:\Users\binpang\Desktop\bishe\ste_GAN_ography\model.py", line 147, in __init__
+    self.alice_step = optimizer.minimize(Alice_loss, var_list= self.Alice_vars)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\training\optimizer.py", line 289, in minimize
+    name=name)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\training\optimizer.py", line 403, in apply_gradients
+    self._create_slots(var_list)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\training\adam.py", line 117, in _create_slots
+    self._zeros_slot(v, "m", self._name)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\training\optimizer.py", line 647, in _zeros_slot
+    named_slots[var] = slot_creator.create_zeros_slot(var, op_name)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\training\slot_creator.py", line 121, in create_zeros_slot
+    val = array_ops.zeros(primary.get_shape().as_list(), dtype=dtype)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\ops\array_ops.py", line 1352, in zeros
+    output = constant(zero, shape=shape, dtype=dtype, name=name)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\constant_op.py", line 103, in constant
+    attrs={"value": tensor_value, "dtype": dtype_value}, name=name).outputs[0]
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\ops.py", line 2327, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "D:\anaconda3\envs\tensorflow\lib\site-packages\tensorflow\python\framework\ops.py", line 1226, in __init__
+    self._traceback = _extract_stack()
+
+InvalidArgumentError (see above for traceback): Cannot parse tensor from proto: dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 49152
+  }
+  dim {
+    size: 98304
+  }
+}
+float_val: 0
+
+         [[Node: zeros_8 = Const[dtype=DT_FLOAT, value=<Invalid TensorProto: dtype: DT_FLOAT tensor_shape { dim { size: 49152 } dim { size: 98304 } } float_val: 0>, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
