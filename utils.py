@@ -72,14 +72,14 @@ def convertArr2Img(list, width, height, rgb):
 
 '''
 求图片或明文的距离
-@param weidu: 如果是[1],则是求文字的距离，如果是[1,2]则是求图片的距离
+@param weidu: 如果是[1],则是求文字的距离，如果是[1,2, 3]则是求图片的距离
 '''
 def Distance(P1, P2, weidu):
       return tf.reduce_sum(tf.abs(P1 - P2), weidu)
 
-def calculate_bit_error(P1, P2):
+def calculate_bit_error(P1, P2, weidu):
       boolean_error = tf.cast(tf.not_equal(tf.sign(P1), tf.sign(P2)), tf.float32)
-      return tf.reduce_mean(tf.reduce_sum(boolean_error, [1]))
+      return tf.reduce_mean(tf.reduce_sum(boolean_error, weidu))
 
 
 def save_images(images, i, folder):

@@ -142,11 +142,13 @@ class Model:
         Eve_loss = Eve_fake_loss + Eve_real_loss
 
         #Alice的损失函数
-        Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, tf.to_float(tf.stack(self.data_images)), [1, 2]))
+        Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, tf.to_float(tf.stack(self.data_images)), [1, 2, 3]))
         Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * Eve_loss
  
         #定义优化器
-        optimizer = tf.train.AdamOptimizer(self.conf.learning_rate)
+        optimizer1 = tf.train.AdamOptimizer(self.conf.learning_rate)
+        optimizer2 = tf.train.AdamOptimizer(self.conf.learning_rate)
+        optimizer3 = tf.train.AdamOptimizer(self.conf.learning_rate)
         
         #获取变量列表
         self.Alice_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "alice/")
@@ -154,16 +156,17 @@ class Model:
         self.Eve_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'eve/')
 
         #定义trainning step
-        self.alice_step = optimizer.minimize(Alice_loss, var_list= self.Alice_vars)
-        self.bob_step = optimizer.minimize(Bob_loss, var_list= self.Bob_vars)
-        self.eve_step = optimizer.minimize(Eve_loss, var_list= self.Eve_vars)
+        self.alice_step = optimizer1.minimize(Alice_loss, var_list= self.Alice_vars)
+        self.bob_step = optimizer2.minimize(Bob_loss, var_list= self.Bob_vars)
+        self.eve_step = optimizer3.minimize(Eve_loss, var_list= self.Eve_vars)
 
         #定义Saver
         self.alice_saver = tf.train.Saver(self.Alice_vars)
         self.bob_saver = tf.train.Saver(self.Bob_vars)
         self.eve_saver = tf.train.Saver(self.Eve_vars)
 
-        self.Bob_bit_error = utils.calculate_bit_error(self.P, bob_fc)
+        self.Bob_bit_error = utils.calculate_bit_error(self.P, bob_fc, [1])
+        self.Alice_bit_error = utils.calculate_bit_error(self.data_images, self.bob_input, [1,2,3])
 
         #初始化所有变量
         self.sess.run(tf.global_variables_initializer())
@@ -185,7 +188,9 @@ class Model:
 
         eve_conv4 = tf.reshape(eve_conv4, [batch_size, -1])
 
-        eve_fc = fully_connected(eve_conv4, 1, activation_fn = tf.nn.sigmoid, normalizer_fn = BatchNorm,
+        #eve_fc = fully_connected(eve_conv4, 1, activation_fn = tf.nn.sigmoid, normalizer_fn = BatchNorm,
+        #weights_initializer=tf.random_normal_initializer(stddev=1.0))
+        eve_fc = fully_connected(eve_conv4, 1, normalizer_fn = BatchNorm, 
         weights_initializer=tf.random_normal_initializer(stddev=1.0))
         return eve_fc
 
@@ -195,13 +200,14 @@ class Model:
         for i in range(epochs):
             if i % 100 == 0:
                 bit_error = self.Bob_bit_error.eval()
-                print("step {}, bit error {}".format(i, bit_error))
+                alice_error = self.Alice_bit_error.eval()
+                print("step {}, bob bit error {}, alice bit error".format(i, bit_error, alice_error))
                 bob_results.append(bit_error)
             
             self.alice_step.run()
             self.bob_step.run()
             self.eve_step.run()
-        return bob_result
+        return bob_results
             
         
     
