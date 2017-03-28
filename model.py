@@ -94,7 +94,7 @@ class Model:
         weights_initializer=tf.random_normal_initializer(stddev=1.0), scope = 'alice/alice_fc6')'''
         image_length1 = image_length - N
         alice_fc = fc_layer(Alice_input, shape = (image_length, 2 * image_length1), name = 'alice/alice_fc')
-        alice_fc = tf.reshape(alice_fc, [batch_size, image_length-N, 1])
+        alice_fc = tf.reshape(alice_fc, [batch_size, 2 * image_length1, 1])
         alice_conv1 = conv_layer(alice_fc, filter_shape = [4,1,2], stride = 1, sigmoid = True, name = 'alice/alice_conv1')
         alice_conv2 = conv_layer(alice_conv1, filter_shape = [2,2,4], stride = 2, sigmoid = True, name = 'alice/alice_conv2')
         alice_conv3 = conv_layer(alice_conv2, filter_shape = [1,4,4], stride = 1, sigmoid = True, name = 'alice/alice_conv3')
