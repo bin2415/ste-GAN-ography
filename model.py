@@ -57,6 +57,7 @@ class Model:
         #Alice_image = np.array(self.data_images).reshape(batch_size, self.image_height * self.image_width * self.rgb)
         #Alice_image = [np.array(imageTemp).ravel() for imageTemp in self.data_images]
         self.data_images = tf.stack(self.data_images)
+        self.data_images = tf.to_float(self.data_images)
         Alice_image = tf.to_float(tf.reshape(self.data_images, [batch_size, -1]))
         print("转换一维数组成功")
         #Alice_image = tf.reshape(self.data_images, [batch_size, self.image_width * self.image_height * self.rgb])
@@ -110,7 +111,7 @@ class Model:
         #将batch_norm与激活函数添加其中
 
         #Eve网络
-        eve_real = self.discriminator_stego_nn(tf.to_float(self.data_images), batch_size)
+        eve_real = self.discriminator_stego_nn(self.data_images, batch_size)
         eve_fake = self.discriminator_stego_nn(self.bob_input, batch_size)
 
         ########################################
@@ -142,7 +143,7 @@ class Model:
         Eve_loss = Eve_fake_loss + Eve_real_loss
 
         #Alice的损失函数
-        Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, tf.to_float(tf.stack(self.data_images)), [1, 2, 3]))
+        Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, self.data_images, [1, 2, 3]))
 
         Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * Eve_loss
  
@@ -167,7 +168,7 @@ class Model:
         self.eve_saver = tf.train.Saver(self.Eve_vars)
 
         self.Bob_bit_error = utils.calculate_bit_error(self.P, bob_fc, [1])
-        self.Alice_bit_error = utils.calculate_bit_error(tf.to_float(self.data_images), self.bob_input, [1,2,3])
+        self.Alice_bit_error = utils.calculate_bit_error(self.data_images, self.bob_input, [1,2,3])
 
         #初始化所有变量
         self.sess.run(tf.global_variables_initializer())
