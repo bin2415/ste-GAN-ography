@@ -125,7 +125,7 @@ class Model:
         bob_conv3 = convolution2d(bob_conv2, 64 * 4, kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv3')
 
-        bob_conv4 = convolution2d(bob_conv2, 64 * 8,kernel_size = [5, 5], stride = [2,2],
+        bob_conv4 = convolution2d(bob_conv3, 64 * 8,kernel_size = [5, 5], stride = [2,2],
         activation_fn= tf.nn.relu, normalizer_fn = BatchNorm, scope = 'bob/conv4')
 
         bob_conv4 = tf.reshape(bob_conv4, [batch_size, -1])
