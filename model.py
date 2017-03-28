@@ -143,6 +143,7 @@ class Model:
 
         #Alice的损失函数
         Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, tf.to_float(tf.stack(self.data_images)), [1, 2, 3]))
+
         Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * Eve_loss
  
         #定义优化器
@@ -166,7 +167,7 @@ class Model:
         self.eve_saver = tf.train.Saver(self.Eve_vars)
 
         self.Bob_bit_error = utils.calculate_bit_error(self.P, bob_fc, [1])
-        self.Alice_bit_error = utils.calculate_bit_error(self.data_images, self.bob_input, [1,2,3])
+        self.Alice_bit_error = utils.calculate_bit_error(tf.to_float(self.data_images), self.bob_input, [1,2,3])
 
         #初始化所有变量
         self.sess.run(tf.global_variables_initializer())
