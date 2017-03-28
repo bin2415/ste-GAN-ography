@@ -160,7 +160,7 @@ class Model:
         #定义trainning step
         self.alice_step = optimizer1.minimize(Alice_loss, var_list= self.Alice_vars)
         self.bob_step = optimizer2.minimize(Bob_loss, var_list= self.Bob_vars)
-        self.eve_step = optimizer3.minimize(Eve_loss, var_list= self.Eve_vars)
+        self.eve_step = optimizer3.minimize(self.Eve_loss, var_list= self.Eve_vars)
 
         #定义Saver
         self.alice_saver = tf.train.Saver(self.Alice_vars)
