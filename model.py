@@ -202,7 +202,7 @@ class Model:
             if i % 100 == 0:
                 bit_error = self.Bob_bit_error.eval()
                 alice_error = self.Alice_bit_error.eval()
-                print("step {}, bob bit error {}, alice bit error".format(i, bit_error, alice_error))
+                print("step {}, bob bit error {}, alice bit error {}".format(i, bit_error, alice_error))
                 bob_results.append(bit_error)
             
             self.alice_step.run()
