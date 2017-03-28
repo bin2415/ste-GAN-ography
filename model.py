@@ -140,12 +140,12 @@ class Model:
         #Eve的损失函数
         Eve_fake_loss = tf.reduce_mean(cross_entropy(logits = eve_fake, labels = tf.zeros_like(eve_fake)))
         Eve_real_loss = tf.reduce_mean(cross_entropy(logits = eve_real, labels = tf.ones_like(eve_real)))
-        Eve_loss = Eve_fake_loss + Eve_real_loss
+        self.Eve_loss = Eve_fake_loss + Eve_real_loss
 
         #Alice的损失函数
         Alice_C_loss = tf.reduce_mean(utils.Distance(self.bob_input, self.data_images, [1, 2, 3]))
 
-        Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * Eve_loss
+        Alice_loss = self.conf.alphaA * Alice_C_loss + self.conf.alphaB * Bob_loss + self.conf.alphaC * self.Eve_loss
  
         #定义优化器
         optimizer1 = tf.train.AdamOptimizer(self.conf.learning_rate)
@@ -203,7 +203,8 @@ class Model:
             if i % 100 == 0:
                 bit_error = self.Bob_bit_error.eval()
                 alice_error = self.Alice_bit_error.eval()
-                print("step {}, bob bit error {}, alice bit error {}".format(i, bit_error, alice_error))
+                eve_error = self.Eve_loss.eval()
+                print("step {}, bob bit error {}, alice bit error {}, eve loss {}".format(i, bit_error, alice_error, eve_error))
                 bob_results.append(bit_error)
             
             self.alice_step.run()
